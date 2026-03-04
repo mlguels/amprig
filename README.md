@@ -1,1 +1,1 @@
-# powerrig
+# amprig
