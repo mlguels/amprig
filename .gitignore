@@ -1,1 +1,23 @@
+cat >> .gitignore <<'EOF'
+
+# Go build output
+/bin/
+/dist/
+*.exe
+*.out
+
+# Go artifacts
+*.test
+*.prof
+
+# OS / editor junk
+.DS_Store
+.vscode/
+.idea/
+
+# Node (if applicable)
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+EOF
