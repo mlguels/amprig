@@ -1,0 +1,23 @@
+name: smoke-hv-startup
+version: 1
+
+steps:
+  - type: set_voltage
+    value_v: 400
+    current_limit_a: 10
+
+  - type: wait
+    duration: 3s
+
+  - type: measure
+    metrics: ["voltage_v", "current_a"]
+
+  - type: assert
+    metric: voltage_v
+    op: "<="
+    value: 430
+
+  - type: assert
+    metric: current_a
+    op: "<="
+    value: 10
