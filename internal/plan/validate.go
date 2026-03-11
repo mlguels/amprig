@@ -33,21 +33,21 @@ func Validate(plan *Plan) error {
 			}
 		case "wait":
 			if step.Duration <= 0 {
-				return fmt.Errorf("step %d (duration): duration must be > 0", stepNum)
+				return fmt.Errorf("step %d (wait): duration must be > 0", stepNum)
 			}
 		case "measure":
 			if len(step.Metrics) <= 0 {
-				return fmt.Errorf("step %d (metrics): metrics must be > 0", stepNum)
+				return fmt.Errorf("step %d (measure): measure must be > 0", stepNum)
 			}
 		case "assert":
 			if step.Metric == "" {
 				return fmt.Errorf("step %d (metric): metric must not be empty", stepNum)
 			}
 			if step.Op == "" {
-				return fmt.Errorf("step %d (metric): op must not be empty", stepNum)
+				return fmt.Errorf("step %d (metric): assert must not be empty", stepNum)
 			}
 			if step.Value == 0 {
-				return fmt.Errorf("step %d (metric): value must be > 0", stepNum)
+				return fmt.Errorf("step %d (metric): assert must be > 0", stepNum)
 			}
 
 			switch step.Op {
@@ -57,7 +57,7 @@ func Validate(plan *Plan) error {
 			}
 
 		default:
-			return fmt.Errorf("step %d: unknown step unknown step type %q", stepNum, step.Type)
+			return fmt.Errorf("step %d: unknown step type %q", stepNum, step.Type)
 		}
 	}
 	return nil
