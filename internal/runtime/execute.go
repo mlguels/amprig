@@ -10,6 +10,8 @@ func NewExecutors() map[string]Executor {
 	return map[string]Executor{
 		"set_voltage": SetVoltageExecutor{},
 		"wait":        WaitExecutor{},
+		"measure":     MeasureExecutor{},
+		"assert":      AssertExecutor{},
 	}
 }
 
@@ -22,6 +24,8 @@ func ExecutePlan(p *plan.Plan) error {
 		if !ok {
 			return fmt.Errorf("step %d: no executor registered for type %q", i+1, step.Type)
 		}
+
+		fmt.Printf("Running step %d: %s\n", i+1, step.Type)
 
 		if err := executor.Execute(step, rt); err != nil {
 			return fmt.Errorf("step %d (%s): %w", i+1, step.Type, err)
