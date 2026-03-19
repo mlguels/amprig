@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/mlguels/amprig/internal/plan"
+	"github.com/mlguels/amprig/internal/runtime"
 )
 
 func main() {
@@ -30,4 +31,10 @@ func main() {
 	for i, step := range p.Steps {
 		fmt.Printf("%d. %s\n", i+1, step.Type)
 	}
+
+	if err := runtime.ExecutePlan(p); err != nil {
+		fmt.Fprintln(os.Stderr, "execution error:", err)
+		os.Exit(1)
+	}
+	fmt.Println("Execution completed successfully")
 }
