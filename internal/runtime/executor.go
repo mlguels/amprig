@@ -28,3 +28,19 @@ func (e WaitExecutor) Execute(step plan.Step, rt *Runtime) error {
 	time.Sleep(step.Duration)
 	return nil
 }
+
+type MeasureExecutor struct{}
+
+func (e MeasureExecutor) Execute(step plan.Step, rt *Runtime) error {
+	for _, metric := range step.Metrics {
+		switch metric {
+		case "voltage_v":
+			rt.measurements[metric] = rt.currentVoltageV
+		case "current_a":
+			rt.measurements[metric] = rt.currentLimitA
+		default:
+			return fmt.Errorf("Metric not found %q", metric)
+		}
+	}
+	return nil
+}
