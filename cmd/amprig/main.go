@@ -32,9 +32,32 @@ func main() {
 		fmt.Printf("%d. %s\n", i+1, step.Type)
 	}
 
-	if err := runtime.ExecutePlan(p); err != nil {
+	result, err := runtime.ExecutePlan(p)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "execution error:", err)
+		fmt.Printf("Plan result so far: %+v\n", result)
 		os.Exit(1)
 	}
 	fmt.Println("Execution completed successfully")
+
+	resultStatus := "FAILED"
+	if result.Success {
+		resultStatus = "PASSED"
+	}
+
+	passed := 0
+	for _, step := range result.Steps {
+		if step.Status == "passed" {
+			passed++
+		}
+	}
+
+	totalDuration := result.FinishedAt.Sub(result.StartedAt)
+
+	fmt.Printf("\nSummary\n")
+	fmt.Printf("-------\n")
+	fmt.Printf("Plan: %s\n", result.PlanName)
+	fmt.Printf("Result: %s\n", resultStatus)
+	fmt.Printf("Steps: %d/%d\n", passed, len(result.Steps))
+	fmt.Printf("Total Duration: %v\n", totalDuration)
 }
