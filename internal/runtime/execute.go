@@ -58,8 +58,8 @@ func ExecutePlan(p *plan.Plan) (*PlanResult, error) {
 		stepResult := StepResult{
 			StepNumber: i + 1,
 			StepType:   step.Type,
-			Status:     "success",
-			Message:    "Success",
+			Status:     "passed",
+			Message:    "Passed",
 			Duration:   duration,
 		}
 
