@@ -1,0 +1,9 @@
+syntax = "proto3";
+service RouteGuide {
+  rpc SetVoltage(SetVoltageRequest) returns (SetVoltageResponse);
+  rpc GetMeasurement(GetMeasurementsRequest) returns (GetMeasurementsResponse);
+}
+
+message SetVoltageRequest {
+  
+}
