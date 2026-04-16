@@ -1,14 +1,20 @@
 package device
 
-import "fmt"
+import (
+	"fmt"
+	"sync"
+	"time"
+)
 
 // We have a struct that simulates a power supply unit (could be any type of machine)
 // CurrentStatus is a custom type Status
 type SimulatedPSU struct {
+	mu             sync.Mutex
 	DeviceID       string
 	CurrentVoltage float64
 	MaxVoltage     float64
 	CurrentStatus  Status
+	CurrentAmps    float64
 }
 
 // These methods take in a pointer to avoid copying and to
@@ -32,4 +38,33 @@ func (s *SimulatedPSU) EmergencyStop() error {
 	fmt.Printf("[SAFEGUARD Emergency stop for device: %s]\n", s.DeviceID)
 
 	return nil
+}
+
+func (s *SimulatedPSU) Start() {
+
+	go func() {
+		tick := time.NewTicker(100 * time.Millisecond)
+		defer tick.Stop()
+		for range tick.C {
+			s.mu.Lock()
+
+			if s.CurrentStatus == Running {
+				s.CurrentVoltage += 0.02
+				s.CurrentAmps += 0.01
+			}
+
+			s.mu.Unlock()
+		}
+	}()
+
+}
+
+func (s *SimulatedPSU) GetTelemetry() Telemetry {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	return Telemetry{
+		Voltage: s.CurrentVoltage,
+		Current: s.CurrentAmps,
+	}
 }

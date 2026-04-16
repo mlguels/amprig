@@ -21,4 +21,10 @@ type Device interface {
 	GetID() string
 	GetStatus() Status
 	EmergencyStop() error
+	GetTelemetry() Telemetry
+}
+
+type Telemetry struct {
+	Voltage float64
+	Current float64
 }

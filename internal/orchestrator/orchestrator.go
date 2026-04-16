@@ -31,6 +31,8 @@ func (o *Orchestrator) Run(ctx context.Context) error {
 					ticker.Stop()
 					return fmt.Errorf("safety check failed for: %s: %w\n", device.GetID(), err)
 				}
+				tel := device.GetTelemetry()
+				fmt.Printf("📊 [%s] Telemetry: %.2fV | %.2fA\n", device.GetID(), tel.Voltage, tel.Current)
 			}
 
 		case <-ctx.Done():

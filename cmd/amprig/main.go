@@ -14,7 +14,7 @@ func main() {
 	newPSU := &device.SimulatedPSU{
 		DeviceID:       "TEST-RIG-01",
 		CurrentVoltage: 400.0,
-		CurrentStatus:  device.Warning,
+		CurrentStatus:  device.Running,
 	}
 
 	fmt.Printf("Device [%s] Status [%s] at [%.2f]V\n", newPSU.DeviceID, newPSU.CurrentStatus, newPSU.CurrentVoltage)
@@ -38,7 +38,7 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
+	newPSU.Start()
 	if err := o.Run(ctx); err != nil {
 		fmt.Printf("Orchestrator stopped: %v\n", err)
 	}
