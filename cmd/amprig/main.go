@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/mlguels/amprig/internal/device"
@@ -11,25 +11,30 @@ import (
 )
 
 func main() {
+	logger := slog.Default()
+	slog.SetDefault(logger)
+
+	slog.Info("Starting Amprig Orchestrator", "version", "1.0.0")
+
 	newPSU := &device.SimulatedPSU{
 		DeviceID:       "TEST-RIG-01",
 		CurrentVoltage: 400.0,
 		CurrentStatus:  device.Running,
 	}
 
-	fmt.Printf("Device [%s] Status [%s] at [%.2f]V\n", newPSU.DeviceID, newPSU.CurrentStatus, newPSU.CurrentVoltage)
+	slog.Info("device initialized status", "device_id", newPSU.DeviceID, "device_status", newPSU.CurrentStatus, "device_voltage", newPSU.CurrentVoltage)
 
 	err := safety.ValidateDevice(newPSU)
 	if err != nil {
-		fmt.Printf("Safety system reported an error: [%s]\n", err)
+		slog.Error("safety validation failed", "error", err)
 	}
 
-	fmt.Printf("Device [%s] is [%s] at [%.2f]V\n", newPSU.DeviceID, newPSU.CurrentStatus, newPSU.CurrentVoltage)
+	slog.Info("device_info", "device_id", newPSU.DeviceID, "current_status", newPSU.CurrentStatus.String(), "current_voltage", newPSU.CurrentVoltage)
 
 	if newPSU.CurrentVoltage == 0.0 && newPSU.CurrentStatus == device.Error {
-		fmt.Println("SUCCESS: System is in Safe State")
+		slog.Info("shutdown check successful", "state", "SAFE")
 	} else {
-		fmt.Println("FAILURE: System did not shut down")
+		slog.Error("shutdown check failed", "state", "UNSAFE")
 	}
 
 	o := orchestrator.Orchestrator{}
@@ -40,57 +45,6 @@ func main() {
 	defer cancel()
 	newPSU.Start()
 	if err := o.Run(ctx); err != nil {
-		fmt.Printf("Orchestrator stopped: %v\n", err)
+		slog.Warn("orchestrator stopped", "error", err)
 	}
 }
-
-// planPath := flag.String("plan", "plans/smoke.yaml", "path to test plan")
-// flag.Parse()
-
-// p, err := plan.Load(*planPath)
-// if err != nil {
-// 	fmt.Fprintln(os.Stderr, "load error:", err)
-// 	os.Exit(1)
-// }
-
-// if err := plan.Validate(p); err != nil {
-// 	fmt.Fprintln(os.Stderr, "validation error:", err)
-// 	os.Exit(1)
-// }
-
-// fmt.Printf("Plan: %s\n", p.Name)
-// fmt.Printf("Version: %d\n", p.Version)
-// fmt.Printf("Steps: %d\n", len(p.Steps))
-
-// for i, step := range p.Steps {
-// 	fmt.Printf("%d. %s\n", i+1, step.Type)
-// }
-
-// result, err := runtime.ExecutePlan(p)
-// if err != nil {
-// 	fmt.Fprintln(os.Stderr, "execution error:", err)
-// 	fmt.Printf("Plan result so far: %+v\n", result)
-// 	os.Exit(1)
-// }
-// fmt.Println("Execution completed successfully")
-
-// resultStatus := "FAILED"
-// if result.Success {
-// 	resultStatus = "PASSED"
-// }
-
-// passed := 0
-// for _, step := range result.Steps {
-// 	if step.Status == "passed" {
-// 		passed++
-// 	}
-// }
-
-// totalDuration := result.FinishedAt.Sub(result.StartedAt)
-
-// fmt.Printf("\nSummary\n")
-// fmt.Printf("-------\n")
-// fmt.Printf("Plan: %s\n", result.PlanName)
-// fmt.Printf("Result: %s\n", resultStatus)
-// fmt.Printf("Steps: %d/%d\n", passed, len(result.Steps))
-// fmt.Printf("Total Duration: %v\n", totalDuration)
