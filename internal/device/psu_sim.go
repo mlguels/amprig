@@ -1,7 +1,7 @@
 package device
 
 import (
-	"fmt"
+	"log/slog"
 	"sync"
 	"time"
 )
@@ -28,15 +28,16 @@ func (s *SimulatedPSU) GetStatus() Status {
 	return s.CurrentStatus
 }
 
-// This method handles the EmergencyStop() func of the interface
+// If triggered sets voltage to 0
+// Sets status to Error
 func (s *SimulatedPSU) EmergencyStop() error {
-	// We are setting the CurrentVoltage to 0 (simulating turning off the device)
 	s.CurrentVoltage = 0
-	// Then we set the status to Error which is in the type Status
 	s.CurrentStatus = Error
-	// We print it to the console with the deviceid
-	fmt.Printf("[SAFEGUARD Emergency stop for device: %s]\n", s.DeviceID)
 
+	slog.Error("emergency stop triggered",
+		"device_id", s.DeviceID,
+		"status", s.CurrentStatus.String(),
+	)
 	return nil
 }
 
